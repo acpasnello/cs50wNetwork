@@ -5,7 +5,8 @@ from django.shortcuts import render
 from django.urls import reverse
 
 from .models import User
-
+# U: tony
+# P: network
 
 def index(request):
     return render(request, "network/index.html")
