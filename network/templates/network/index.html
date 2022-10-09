@@ -1,5 +1,12 @@
 {% extends "network/layout.html" %}
 
 {% block body %}
-    TODO
+  <h2>All Posts</h2>
+  {% if user.is_authenticated %}
+    <form method="POST" action="{% url 'post' %}">
+      {% csrf_token %}
+      {{ postform }}
+      <button class="btn btn-outline-warning">Post</button>
+    </form>
+  {% endif %}
 {% endblock %}

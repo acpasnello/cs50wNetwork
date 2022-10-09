@@ -5,12 +5,14 @@ from django.shortcuts import render
 from django.urls import reverse
 
 from .models import User
+from .forms import PostForm
+from .helpers import login_required
 # U: tony
 # P: network
 
 def index(request):
-    return render(request, "network/index.html")
-
+    form = PostForm()
+    return render(request, "network/index.html", {"postform": form})
 
 def login_view(request):
     if request.method == "POST":
@@ -23,6 +25,7 @@ def login_view(request):
         # Check if authentication successful
         if user is not None:
             login(request, user)
+            request.session['user_id'] = user.id
             return HttpResponseRedirect(reverse("index"))
         else:
             return render(request, "network/login.html", {
@@ -62,3 +65,16 @@ def register(request):
         return HttpResponseRedirect(reverse("index"))
     else:
         return render(request, "network/register.html")
+
+@login_required
+def post(request):
+    # If POST, process new post
+    if request.method == "POST":
+        data = request.POST
+        form = PostForm(data)
+        if form.is_valid():
+            # Add logged in user as poster
+            form.poster = request.session['user_id']
+
+    else:
+        return render(request, "network/index.html")

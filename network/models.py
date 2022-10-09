@@ -18,5 +18,5 @@ class Like(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
 
 class Follow(models.Model):
-    follower = models.ForeignKey(User, on_delete=models.CASCADE, related_name="")
-    following = models.ForeignKey(User, on_delete=models.CASCADE, related_name="")
+    follower = models.ForeignKey(User, on_delete=models.CASCADE, related_name="myfollowing")
+    following = models.ForeignKey(User, on_delete=models.CASCADE, related_name="myfollowers")
