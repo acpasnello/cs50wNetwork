@@ -1,0 +1,19 @@
+.body {
+  margin: 5px;
+}
+
+.postbox {
+  padding: 5px;
+  min-height: 100px;
+  min-width: 300px;
+  max-width: 100%;
+  border: 1px solid #e6e6e6;
+  border-radius: 3px;
+}
+
+#newposttext {
+  rows: 2;
+  min-height: 3em;
+  height: 3em;
+  width: 100%;
+}
