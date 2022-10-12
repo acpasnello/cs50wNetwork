@@ -4,6 +4,7 @@
 
 .postbox {
   padding: 5px;
+  margin-bottom: 3px;
   min-height: 100px;
   min-width: 300px;
   max-width: 100%;

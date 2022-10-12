@@ -15,8 +15,8 @@ from .forms import PostForm
 def index(request):
     form = PostForm()
     # Get 10 posts at a time
-
-    return render(request, "network/index.html", {"postform": form})
+    posts = Post.objects.all()
+    return render(request, "network/index.html", {"postform": form, 'posts': posts})
 
 def login_view(request):
     if request.method == "POST":

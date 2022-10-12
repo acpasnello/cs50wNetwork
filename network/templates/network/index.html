@@ -11,4 +11,12 @@
       </form>
     </div>
   {% endif %}
+  {% for post in posts %}
+    <div class="postbox">
+      {{ post.poster }}<br>
+      {{ post.content }}<br>
+      {{ post.posted }}<br>
+      {{ post.likecount }} {% if likecount == 1 %}Like{% else %}Likes{% endif %}
+    </div>
+  {% endfor %}
 {% endblock %}
