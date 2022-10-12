@@ -10,7 +10,7 @@ class Post(models.Model):
     content = models.TextField( )
     posted = models.DateTimeField(auto_now_add=True)
     lastmodified = models.DateTimeField(auto_now=True)
-    likecount = models.IntegerField()
+    likecount = models.IntegerField(default=0)
 
 class Like(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="MyLikes")
