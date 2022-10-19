@@ -22,13 +22,14 @@ document.addEventListener('DOMContentLoaded', function() {
         likecount.innerHTML = parseInt(likecount.innerHTML) - 1;
         iconinner.className = "fa-regular fa-heart";
         icon.style.color = "#A9A9A9";
-
+        iconinner.dataset.liked = "false";
 
       }
       else {
         likecount.innerHTML = parseInt(likecount.innerHTML) + 1;
         iconinner.className = "fa-solid fa-heart";
         icon.style.color = "#FF0000";
+        iconinner.dataset.liked = "true";
       }
       postid = parseInt(postid)
       update_like(postid, status)
