@@ -1,0 +1,15 @@
+{% extends "network/layout.html" %}
+{% load static %}
+
+{% block body %}
+  <div id="profileview">
+    <h4>{{ user.username }}</h4>
+    <p><a class="listlink" onclick="get_list(this)">{{ followerCount }} followers</a>
+    <a class="listlink" onclick="get_list(this)">{{ followingCount }} following</a></p>
+  </div>
+  <div id="listview">
+    {% block list %}
+    {% endblock %}
+  </div>
+  <script src="{% static 'network/profile.js' %}"></script>
+{% endblock %}

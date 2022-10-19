@@ -1,8 +1,4 @@
 document.addEventListener('DOMContentLoaded', function() {
-  // var octicons = require("@primer/octicons")
-  // icon = document.querySelector("#likeicon")
-  // icon.innerHTML = octicons.alert.heights[16].path
-  // icon.className = "octicon"
 
   document.querySelectorAll(".likeicon").forEach(function(icon) {
     icon.onclick = function() {

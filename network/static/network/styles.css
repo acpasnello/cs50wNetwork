@@ -19,6 +19,14 @@
   width: 100%;
 }
 
+.postposter {
+  color: black;
+  text-decoration: none;
+}
+.postposter:hover {
+  cursor: pointer;
+}
+
 .editpost {
   color: blue;
   text-decoration: underline;

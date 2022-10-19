@@ -1,6 +1,6 @@
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 from django.urls import reverse
 
@@ -119,3 +119,19 @@ def unlike(request, postid):
         post.save()
     return render(request, "network/index.html")
     # return JsonResponse({"message": f"Post liked by {request.user}."}, status=201)
+
+def profile(request, userid):
+    user = User.objects.get(pk=userid)
+    followerCount = user.myfollowers.count()
+    followingCount = user.myfollowing.count()
+    return render(request, "network/profile.html", {"user": user, "followerCount": followerCount, "followingCount": followingCount})
+
+def userlist(request, userid, desiredlist):
+    user = User.objects.get(pk=userid)
+    if desiredlist == "followers":
+        list = user.myfollowers
+    elif desiredlist == "following":
+        list = user.myfollowing
+    else:
+        return HttpResponseRedirect(reverse('profile', args=[userid]))
+    return render(request, "network/userlist.html", {"list": list})

@@ -15,7 +15,7 @@
   {% endif %}
   {% for post in posts %}
     <div class="postbox">
-      <h5>{{ post.poster }}</h5>
+      <h5><a class="postposter" href="{% url 'profile' post.poster.id %}">{{ post.poster }}</a></h5>
       {% if user == post.poster %}<span class="editpost">Edit</span><br>{% endif %}
       <span class="postcontent">{{ post.content }}</span><br>
       <span class="posttime">{{ post.posted }}</span><br>
