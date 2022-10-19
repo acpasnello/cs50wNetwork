@@ -1,4 +1,6 @@
 {% extends "network/layout.html" %}
+{% load static %}
+{% load network_extras %}
 
 {% block body %}
   <h2>All Posts</h2>
@@ -13,10 +15,23 @@
   {% endif %}
   {% for post in posts %}
     <div class="postbox">
-      {{ post.poster }}<br>
-      {{ post.content }}<br>
-      {{ post.posted }}<br>
-      {{ post.likecount }} {% if likecount == 1 %}Like{% else %}Likes{% endif %}
+      <h5>{{ post.poster }}</h5>
+      {% if user == post.poster %}<span class="editpost">Edit</span><br>{% endif %}
+      <span class="postcontent">{{ post.content }}</span><br>
+      <span class="posttime">{{ post.posted }}</span><br>
+
+        {% if liked|get_value:post.id == True %}
+          <span data-postid="{{ post.id }}" class="likeicon" style="color: #FF0000">
+          <i data-liked="true" class="fa-solid fa-heart"></i>
+        {% else %}
+          <span data-postid="{{ post.id }}" class="likeicon" style="color: #A9A9A9">
+          <i data-liked="false" class="fa-regular fa-heart"></i>
+        {% endif %}
+        </span>
+      <span id="post{{ post.id }}likes" class="postlikes">
+        {{ post.likecount }}
+      </span><br>
+      <span class="postcomment">Comment</span>
     </div>
   {% endfor %}
 {% endblock %}

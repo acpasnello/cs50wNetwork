@@ -1,9 +1,10 @@
 from django.contrib import admin
-from .models import Post
+from .models import Post, Like
 
 # Register your models here.
 class PostAdmin(admin.ModelAdmin):
-    fields = ('poster', 'content', 'posted', 'lastmodified', 'likecount')
-    readonly_fields = ('posted', 'lastmodified')
+    fields = ('pk', 'poster', 'content', 'posted', 'lastmodified', 'likecount')
+    readonly_fields = ('pk', 'posted', 'lastmodified')
 
 admin.site.register(Post, PostAdmin)
+admin.site.register(Like)

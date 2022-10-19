@@ -3,7 +3,7 @@
 }
 
 .postbox {
-  padding: 5px;
+  padding: 7px;
   margin-bottom: 3px;
   min-height: 100px;
   min-width: 300px;
@@ -17,4 +17,32 @@
   min-height: 3em;
   height: 3em;
   width: 100%;
+}
+
+.editpost {
+  color: blue;
+  text-decoration: underline;
+  text-decoration-color: blue;
+}
+.editpost:hover {
+  cursor: pointer;
+}
+
+.postcontent {
+
+}
+
+.posttime, .postlikes, .postcomment {
+  color: #A9A9A9;
+}
+
+.likeicon:hover {
+  cursor: pointer;
+}
+
+.octicon {
+  display: inline-block;
+  vertical-align: text-top;
+  fill: currentColor;
+  overflow: visible;
 }

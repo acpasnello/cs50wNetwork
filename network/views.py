@@ -15,8 +15,17 @@ from .forms import PostForm
 def index(request):
     form = PostForm()
     # Get 10 posts at a time
-    posts = Post.objects.all()
-    return render(request, "network/index.html", {"postform": form, 'posts': posts})
+    posts = Post.objects.all().order_by('-posted')
+    liked = {}
+    for post in posts:
+        # check if user has liked each post
+        getlikes = Like.objects.filter(post=post).filter(user_id=request.user.id).count()
+        if getlikes > 0:
+            liked[post.pk] = True
+        else:
+            liked[post.pk] = False
+
+    return render(request, "network/index.html", {"postform": form, 'posts': posts, 'liked': liked, 'postcount': range(posts.count())})
 
 def login_view(request):
     if request.method == "POST":
@@ -91,3 +100,22 @@ def post(request):
             return render(request, "network/index.html")
     else:
         return render(request, "network/index.html")
+
+def like(request, postid):
+    post = Post.objects.get(pk=postid)
+    newLike = Like(user=request.user, post=post)
+    newLike.save()
+    post.likecount += 1
+    post.save()
+    return render(request, "network/index.html")
+
+def unlike(request, postid):
+    postid = int(postid)
+    post = Post.objects.get(pk=postid)
+    unlike = Like.objects.filter(user=request.user).filter(post=post)
+    unlike.delete()
+    if post.likecount > 0:
+        post.likecount -= 1
+        post.save()
+    return render(request, "network/index.html")
+    # return JsonResponse({"message": f"Post liked by {request.user}."}, status=201)
