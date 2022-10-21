@@ -3,6 +3,8 @@ from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 from django.urls import reverse
+from django.core import serializers
+import json
 
 from .models import User, Post, Like, Follow
 from .forms import PostForm
@@ -124,14 +126,36 @@ def profile(request, userid):
     user = User.objects.get(pk=userid)
     followerCount = user.myfollowers.count()
     followingCount = user.myfollowing.count()
-    return render(request, "network/profile.html", {"user": user, "followerCount": followerCount, "followingCount": followingCount})
+    posts = Post.objects.filter(poster=user).order_by('-posted')
+    liked = {}
+    for post in posts:
+        # check if user has liked each post
+        getlikes = Like.objects.filter(post=post).filter(user_id=request.user.id).count()
+        if getlikes > 0:
+            liked[post.pk] = True
+        else:
+            liked[post.pk] = False
+    return render(request, "network/profile.html", {"profile_user": user, "followerCount": followerCount, "followingCount": followingCount, 'posts': posts, 'liked': liked})
 
-def userlist(request, userid, desiredlist):
+def get_userlist(request, desiredlist):
+    if request.method == "POST":
+        jsonData = json.loads(request.body)
+        #userid = request.POST.get('userid', default=None)
+        userid = jsonData.get('userid')
     user = User.objects.get(pk=userid)
+    userlist = []
     if desiredlist == "followers":
-        list = user.myfollowers
+        list = user.myfollowers.all()
+        for item in list:
+            userlist.append(User.objects.get(pk=item.follower.id))
     elif desiredlist == "following":
-        list = user.myfollowing
+        list = user.myfollowing.all()
+        for item in list:
+            userlist.append(User.objects.get(pk=item.following.id))
     else:
         return HttpResponseRedirect(reverse('profile', args=[userid]))
-    return render(request, "network/userlist.html", {"list": list})
+
+    # response = JsonResponse({'userlist': userlist})
+    #return JsonResponse(serializers.serialize('json', userlist, use_natural_foreign_keys=True), safe=False)
+    return JsonResponse([item.serialize() for item in userlist], safe=False)
+    # return render(request, "network/userlist.html", {"list": userlist})

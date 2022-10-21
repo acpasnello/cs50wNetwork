@@ -1,9 +1,19 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
+class UserManager(models.Manager):
+    def get_by_natural_key(self, username):
+        return self.get(username=username)
 
 class User(AbstractUser):
-    pass
+    def serialize(self):
+        return {
+            "id": self.id,
+            "username": self.username
+        }
+
+    def natural_key(self):
+        return (self.username)
 
 class Post(models.Model):
     poster = models.ForeignKey(User, on_delete=models.CASCADE, related_name="MyPosts")

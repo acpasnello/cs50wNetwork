@@ -48,9 +48,9 @@
   cursor: pointer;
 }
 
-.octicon {
-  display: inline-block;
-  vertical-align: text-top;
-  fill: currentColor;
-  overflow: visible;
+.listlink {
+  text-decoration: none;
+}
+.listlink:hover {
+  cursor: pointer;
 }

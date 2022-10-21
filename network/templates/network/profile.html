@@ -1,14 +1,40 @@
 {% extends "network/layout.html" %}
 {% load static %}
+{% load network_extras %}
 
 {% block body %}
   <div id="profileview">
-    <h4>{{ user.username }}</h4>
-    <p><a class="listlink" onclick="get_list(this)">{{ followerCount }} followers</a>
-    <a class="listlink" onclick="get_list(this)">{{ followingCount }} following</a></p>
+    <h4>{{ profile_user.username }}</h4>
+    <p>
+      <span class="listlink" id="postsdisplay">Posts</span>
+      <a class="listlink" onclick="get_list(this,{{ profile_user.id }})">{{ followerCount }} followers</a>
+      <a class="listlink" onclick="get_list(this,{{profile_user.id}})">{{ followingCount }} following</a>
+    </p>
+  </div>
+  <div id="postview">
+    {% for post in posts %}
+      <div class="postbox">
+        <h5><a class="postposter" href="{% url 'profile' post.poster.id %}">{{ post.poster }}</a></h5>
+        {% if user == post.poster %}<span class="editpost">Edit</span><br>{% endif %}
+        <span class="postcontent">{{ post.content }}</span><br>
+        <span class="posttime">{{ post.posted }}</span><br>
+        {% if liked|get_value:post.id == True %}
+          <span data-postid="{{ post.id }}" class="likeicon" style="color: #FF0000">
+          <i data-liked="true" class="fa-solid fa-heart"></i>
+        {% else %}
+          <span data-postid="{{ post.id }}" class="likeicon" style="color: #A9A9A9">
+          <i data-liked="false" class="fa-regular fa-heart"></i>
+        {% endif %}
+        </span>
+        <span id="post{{ post.id }}likes" class="postlikes">
+        {{ post.likecount }}
+        </span><br>
+        <span class="postcomment">Comment</span>
+      </div>
+    {% endfor %}
   </div>
   <div id="listview">
-    {% block list %}
+    {% block userlist %}
     {% endblock %}
   </div>
   <script src="{% static 'network/profile.js' %}"></script>
