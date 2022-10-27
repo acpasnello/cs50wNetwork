@@ -1,4 +1,3 @@
-
 from django.urls import path
 
 from . import views
@@ -13,5 +12,7 @@ urlpatterns = [
     path("like/<int:postid>", views.like, name="like"),
     path("unlike/<int:postid>", views.unlike, name="unlike"),
     path("userlist/<str:desiredlist>", views.get_userlist, name="userlist"),
-    path("following", views.following_index, "following")
+    path("following", views.following_index, name="following"),
+    path("editpost", views.editpost, name="editpost"),
+    path("follow", views.updatefollow, name="follow")
 ]

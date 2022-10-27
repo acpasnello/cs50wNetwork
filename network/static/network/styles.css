@@ -12,7 +12,7 @@
   border-radius: 3px;
 }
 
-#newposttext {
+#newposttext, #updatepost {
   rows: 2;
   min-height: 3em;
   height: 3em;
@@ -50,7 +50,20 @@
 
 .listlink {
   text-decoration: none;
+  color: blue;
 }
 .listlink:hover {
   cursor: pointer;
+  color: DarkBlue;
+}
+.listlink:active {
+  color: #A9A9A9;
+}
+
+#followspan {
+  float: right;
+}
+
+#profileview, h4 {
+  display: inline-block;
 }

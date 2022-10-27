@@ -22,6 +22,15 @@ class Post(models.Model):
     lastmodified = models.DateTimeField(auto_now=True)
     likecount = models.IntegerField(default=0)
 
+    def serialize(self):
+        return {
+        "poster": self.poster.id,
+        "content": self.content,
+        "posted": self.posted,
+        "lastmodified": self.lastmodified,
+        "likecount": self.likecount
+        }
+
 class Like(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="MyLikes")
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="likes")

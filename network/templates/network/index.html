@@ -3,7 +3,7 @@
 {% load network_extras %}
 
 {% block body %}
-  <h2>All Posts</h2>
+  <h2>{% block pagetitle %}All Posts{% endblock pagetitle %}</h2>
   {% if user.is_authenticated %}
     <div class="postbox">
       <form method="POST" action="{% url 'post' %}">

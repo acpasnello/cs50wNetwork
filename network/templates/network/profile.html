@@ -5,10 +5,19 @@
 {% block body %}
   <div id="profileview">
     <h4>{{ profile_user.username }}</h4>
+    {% if not selfview %}
+      <span id="followspan">
+        {% if userFollowsProfile %}
+          <button id="followbutton" data-follow="true" data-user="{{ profile_user.username }}" class="btn btn-outline-danger">Unfollow</button>
+        {% else %}
+          <button id="followbutton" data-follow="false" data-user="{{ profile_user.username }}" class="btn btn-outline-primary">Follow</button>
+        {% endif %}
+      </span>
+    {% endif %}
     <p>
       <span class="listlink" id="postsdisplay">Posts</span>
-      <a class="listlink" onclick="get_list(this,{{ profile_user.id }})">{{ followerCount }} followers</a>
-      <a class="listlink" onclick="get_list(this,{{profile_user.id}})">{{ followingCount }} following</a>
+      <a class="listlink" onclick="get_list(this,{{ profile_user.id }})">{{ followerCount }} {% if followerCount == 1 %}Follower{% else %}Followers{% endif %}</a>
+      <a class="listlink" onclick="get_list(this,{{profile_user.id}})">{{ followingCount }} Following</a>
     </p>
   </div>
   <div id="postview">

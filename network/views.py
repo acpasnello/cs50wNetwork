@@ -4,11 +4,12 @@ from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 from django.urls import reverse
 from django.core import serializers
+from django.views.decorators.csrf import csrf_exempt
 import json
 
 from .models import User, Post, Like, Follow
 from .forms import PostForm
-# from .helpers import login_required
+from .helpers import get_likes
 # U: Tony
 # P: network
 # U: admin
@@ -123,10 +124,30 @@ def unlike(request, postid):
     # return JsonResponse({"message": f"Post liked by {request.user}."}, status=201)
 
 def profile(request, userid):
+    # Profile owner
     user = User.objects.get(pk=userid)
-    followerCount = user.myfollowers.count()
-    followingCount = user.myfollowing.count()
+    print(user.username)
+    # Get user's followers and following counts
+    followers = user.myfollowers
+    print(followers.values())
+    followerCount = followers.count()
+    following = user.myfollowing
+    print(following.all())
+    followingCount = following.count()
+    # Check if viewing user follows the profile owner
+    userFollowsProfile = False
+    for item in followers.all():
+        print(item.follower_id)
+        if item.follower_id == request.user.id:
+            userFollowsProfile = True
+            print(userFollowsProfile)
+    # User viewing their own profile?
+    selfview = False
+    if userid == request.user.id:
+        selfview = True
+    # Get profile user's posts
     posts = Post.objects.filter(poster=user).order_by('-posted')
+    # check like status of each post for user viewing profile
     liked = {}
     for post in posts:
         # check if user has liked each post
@@ -135,7 +156,7 @@ def profile(request, userid):
             liked[post.pk] = True
         else:
             liked[post.pk] = False
-    return render(request, "network/profile.html", {"profile_user": user, "followerCount": followerCount, "followingCount": followingCount, 'posts': posts, 'liked': liked})
+    return render(request, "network/profile.html", {"profile_user": user, "followerCount": followerCount, "followingCount": followingCount, 'posts': posts, 'liked': liked, 'userFollowsProfile': userFollowsProfile, 'selfview': selfview})
 
 def get_userlist(request, desiredlist):
     if request.method == "POST":
@@ -144,18 +165,74 @@ def get_userlist(request, desiredlist):
         userid = jsonData.get('userid')
     user = User.objects.get(pk=userid)
     userlist = []
-    if desiredlist == "followers":
+    if desiredlist == "Followers":
         list = user.myfollowers.all()
         for item in list:
             userlist.append(User.objects.get(pk=item.follower.id))
-    elif desiredlist == "following":
+    elif desiredlist == "Following":
         list = user.myfollowing.all()
         for item in list:
             userlist.append(User.objects.get(pk=item.following.id))
     else:
         return HttpResponseRedirect(reverse('profile', args=[userid]))
 
-    # response = JsonResponse({'userlist': userlist})
-    #return JsonResponse(serializers.serialize('json', userlist, use_natural_foreign_keys=True), safe=False)
     return JsonResponse([item.serialize() for item in userlist], safe=False)
-    # return render(request, "network/userlist.html", {"list": userlist})
+
+def following_index(request):
+    userid = request.user.id
+    user = User.objects.get(pk=userid)
+    # print("user: ", user)
+    followinglist = user.myfollowing.values('following')
+    # print("following: ", followinglist)
+    posts = Post.objects.filter(poster__in=followinglist).order_by('-posted')
+    liked = get_likes(posts, userid)
+    form = PostForm()
+    # print(posts)
+    return render(request, "network/following.html", {"posts": posts, "liked": liked, "postform": form})
+
+@csrf_exempt
+def editpost(request):
+    if request.method == "POST":
+        # Load submitted data
+        jsonData = json.loads(request.body)
+        postid = jsonData.get('postid')
+        existingpost = Post.objects.get(pk=postid)
+        print(existingpost)
+        userid = request.user.id
+        print(userid)
+        user = User.objects.get(pk=userid)
+        # Confirm user requesting owns post
+        if existingpost.poster == user:
+            # Update post in database
+            print(existingpost.content)
+            existingpost.content = jsonData.get('newContent')
+            print(existingpost.content)
+            existingpost.save()
+            print(existingpost.serialize())
+            response =  JsonResponse(existingpost.serialize())
+            # response.headers['Access-Control-Allow-Origin', "*"]
+            return response
+        else:
+            message = 'Users may only edit their own posts.'
+            return JsonResponse(message)
+
+@csrf_exempt
+def updatefollow(request):
+    if request.method == "PUT":
+        data = json.loads(request.body)
+        activeUser = User.objects.get(pk=request.user.id)
+        profileUser = User.objects.get(username=data["user"])
+        currentState = data["currentState"]
+        if currentState == "true":
+            # Delete follow instance
+            existingFollow = Follow.objects.filter(follower=activeUser).filter(following=profileUser)
+            existingFollow.delete()
+            return HttpResponse(status=202)
+        elif currentState == "false":
+            # Check follow instance does not exist
+            if Follow.objects.filter(follower=activeUser).filter(following=profileUser):
+                return HttpResponse(status=204)
+            # Save new follow instance
+            newFollow = Follow(follower=activeUser, following=profileUser)
+            newFollow.save()
+            return HttpResponse(status=201)
