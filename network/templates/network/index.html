@@ -13,7 +13,7 @@
       </form>
     </div>
   {% endif %}
-  {% for post in posts %}
+  {% for post in page_obj %}
     <div class="postbox">
       <h5><a class="postposter" href="{% url 'profile' post.poster.id %}">{{ post.poster }}</a></h5>
       {% if user == post.poster %}<span class="editpost">Edit</span><br>{% endif %}
@@ -31,7 +31,35 @@
       <span id="post{{ post.id }}likes" class="postlikes">
         {{ post.likecount }}
       </span><br>
-      <span class="postcomment">Comment</span>
+      <!-- <span class="postcomment">Comment</span> -->
     </div>
+  {% empty %}
+    <p>No posts yet!</p>
   {% endfor %}
+
+
+<nav aria-label="...">
+  <ul class="pagination justify-content-center">
+    <li class="page-item {% if not page_obj.has_previous %}disabled{% endif %}">
+      <a class="page-link" href="?page={% if page_obj.has_previous %}{{ page_obj.previous_page_number }}{% endif %}" tabindex="-1" aria-disabled="true">Previous</a>
+    </li>
+    {% if page_obj.has_previous %}
+      <li class="page-item">
+        <a class="page-link" href="?page={{ page_obj.previous_page_number}}">{{ page_obj.previous_page_number }}</a>
+      </li>
+    {% endif %}
+    <li class="page-item active" aria-current="page">
+      <a class="page-link" href="?page={{ page_obj.number }}"><span>{{ page_obj.number }}</span></a>
+    </li>
+    {% if page_obj.has_next %}
+      <li class="page-item">
+        <a class="page-link" href="?page={{ page_obj.next_page_number}}">{{ page_obj.next_page_number }}</a>
+      </li>
+    {% endif %}
+    <li class="page-item {% if not page_obj.has_next %}disabled{% endif %}">
+      <a class="page-link" href="#">Next</a>
+    </li>
+  </ul>
+</nav>
+
 {% endblock %}

@@ -4,6 +4,7 @@ from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 from django.urls import reverse
 from django.core import serializers
+from django.core.paginator import Paginator
 from django.views.decorators.csrf import csrf_exempt
 import json
 
@@ -28,7 +29,16 @@ def index(request):
         else:
             liked[post.pk] = False
 
-    return render(request, "network/index.html", {"postform": form, 'posts': posts, 'liked': liked, 'postcount': range(posts.count())})
+    paginator = Paginator(posts, 10)
+    if request.GET:
+        if request.GET.get('page'):
+            page_number = request.GET.get('page')
+        else:
+            page_number = 1
+    else:
+        page_number = 1
+    page_obj = paginator.get_page(page_number)
+    return render(request, "network/index.html", {"postform": form, 'page_obj': page_obj, 'posts': posts, 'liked': liked, 'postcount': range(posts.count())})
 
 def login_view(request):
     if request.method == "POST":
@@ -126,21 +136,16 @@ def unlike(request, postid):
 def profile(request, userid):
     # Profile owner
     user = User.objects.get(pk=userid)
-    print(user.username)
     # Get user's followers and following counts
     followers = user.myfollowers
-    print(followers.values())
     followerCount = followers.count()
     following = user.myfollowing
-    print(following.all())
     followingCount = following.count()
     # Check if viewing user follows the profile owner
     userFollowsProfile = False
     for item in followers.all():
-        print(item.follower_id)
         if item.follower_id == request.user.id:
             userFollowsProfile = True
-            print(userFollowsProfile)
     # User viewing their own profile?
     selfview = False
     if userid == request.user.id:
@@ -165,7 +170,7 @@ def get_userlist(request, desiredlist):
         userid = jsonData.get('userid')
     user = User.objects.get(pk=userid)
     userlist = []
-    if desiredlist == "Followers":
+    if desiredlist == "Followers" or desiredlist == "Follower":
         list = user.myfollowers.all()
         for item in list:
             userlist.append(User.objects.get(pk=item.follower.id))
@@ -187,8 +192,17 @@ def following_index(request):
     posts = Post.objects.filter(poster__in=followinglist).order_by('-posted')
     liked = get_likes(posts, userid)
     form = PostForm()
-    # print(posts)
-    return render(request, "network/following.html", {"posts": posts, "liked": liked, "postform": form})
+    
+    paginator = Paginator(posts, 10)
+    if request.GET:
+        if request.GET.get('page'):
+            page_number = request.GET.get('page')
+        else:
+            page_number = 1
+    else:
+        page_number = 1
+    page_obj = paginator.get_page(page_number)
+    return render(request, "network/following.html", {'page_obj': page_obj, "posts": posts, "liked": liked, "postform": form})
 
 @csrf_exempt
 def editpost(request):
